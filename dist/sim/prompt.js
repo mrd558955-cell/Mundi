@@ -52,6 +52,7 @@ import { standingLine } from './standing.js';
 import { habitLine } from './habits.js';
 import { petLine } from './pets.js';
 import { mentorLine } from './mentors.js';
+import { textLines } from './textlog.js';
 import './letters.js';
 import './journey.js';
 import { systemOn, blockSystem, isScenario, SCENARIO_STARTS } from '../core/world.js';
@@ -60,6 +61,7 @@ export const BLOCKS = [
     { id: 'core', name: 'Scene basics', desc: 'World, day and time, weather, place, who is here, and the rules of the scene.' },
     { id: 'world', name: 'The mood around', desc: 'How busy it is here, the public mood and tension of the region, and its prices.', cut: 4 },
     { id: 'memories', name: 'Memories', desc: 'What the people here remember about you, and what happened earlier in this place.', cut: 9 },
+    { id: 'texts', name: 'Texts', desc: 'Your texts with the people here from the last 3 days, with when each was sent.', cut: 5 },
     { id: 'plans', name: 'Plans', desc: 'Plans you made with the people here.', cut: 8 },
     { id: 'focus', name: 'Scene focus', desc: 'Why you are here: a date, a meet-up, someone who came along.', cut: 8 },
     { id: 'solo', name: 'Talking alone', desc: 'Who you are talking to when you talk only with one person.' },
@@ -137,6 +139,7 @@ export function sceneBlocks() {
         world: [worldLine(g, w), festivalLine(g, w), realmLine(g, w), skiesLine(g, w), ...legendLines(g, w)],
         diary: diaryLines(g),
         memories: [...memoryLines(g, w, met, personaName()), ...placeMemoryLines(g, w, present)],
+        texts: textLines(g, w, present),
         plans: planLines(g, present, w),
         focus: [eventLine(g, w), combatLine(g, w), prisonLine(g, w), ...towerLines(g, w), ...contractLines(g, w), ...institutionLines(g, w), focusLine(g, w, present), ...whyHereLines(g, w, present), ...questLines(g)],
         feelings: [feelingLine(g, met)],

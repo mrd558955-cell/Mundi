@@ -7,6 +7,7 @@ import { chat, quiet, personaName, ctx, translateTo } from '../st/bridge.js';
 import { facts, factText, placeName } from './facts.js';
 import { fmtClock as hm } from '../core/fmt.js';
 import { applyVerdict, type Change } from './romance.js';
+import { diaryTexts } from './textlog.js';
 
 export const diaryOn = () => (settings() as any).diaryOnSleep !== false;
 export const diaryEntries = (g: Save): Record<string, string> => (((g as any).journalProse ??= {}) as Record<string, string>);
@@ -24,7 +25,8 @@ export async function writeDiary(g: Save, w: WorldDef, day: number, verdict = tr
     const talk = msgs.map((m: any) => `${m.is_user ? me : m.extra?.mundi_narrator ? 'Narrator' : m.name}: ${clean(m.mes).slice(0, 320)}`);
     let convo = talk.slice(-60).join('\n');
     if (convo.length > 9000) convo = convo.slice(-9000);
-    if (!dayFacts.length && !convo) return { ok: false, changes: [] };
+    const texted = diaryTexts(g, day, me);
+    if (!dayFacts.length && !convo && !texted) return { ok: false, changes: [] };
     // the people of the day: who appears in the facts or spoke
     const spoke = new Set(msgs.filter((m: any) => !m.is_user).map((m: any) => String(m.name ?? '')));
     const people = Object.values(g.cast).filter(r => r.met && (spoke.has(r.name) || dayFacts.some(f => f.who.includes(r.avatar)))).map(r => ({ avatar: r.avatar, name: r.name }));
@@ -33,7 +35,7 @@ export async function writeDiary(g: Save, w: WorldDef, day: number, verdict = tr
         `Each line exactly like this: Name | friendship +1 | romance 0 | a short reason (what happened between them and ${me} today). ` +
         `Friendship and romance go from -3 to +3; 0 when nothing changed. Romance only moves with flirting, dates or love; insults, fights or broken promises are negative. Be honest, not generous.` : '';
     const out = await quiet(`This is one day (day ${day}) in ${me}'s life in ${w.name}.\n\nWhat surely happened:\n${factList || '(nothing noted)'}\n\n` +
-        `${convo ? `What was said that day:\n${convo}\n\n` : ''}Write ${me}'s diary entry for that day, in the first person, in one or two short paragraphs (at most 150 words). ` +
+        `${convo ? `What was said that day:\n${convo}\n\n` : ''}${texted ? `Messages sent by phone that day (not in person):\n${texted}\n\n` : ''}Write ${me}'s diary entry for that day, in the first person, in one or two short paragraphs (at most 150 words). ` +
         `Keep the people's names, what ${me} felt, promises and plans made, the important things that were said, and every relationship moment (asking someone out, a proposal, a breakup, and the answer). Each of the facts above must be in the entry. Use only what is above: invent nothing.${verdictAsk}`, 2000,   // room for models that think first
         'You write short, faithful diary entries from notes and conversations. You never invent events.');
     const raw = String(out ?? '').replace(/<(think|thinking|reasoning)>[\s\S]*?<\/\1>/gi, '');

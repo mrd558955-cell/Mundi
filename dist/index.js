@@ -79,7 +79,8 @@ function follow() {
     const redraw = () => { if (state.open)
         notify(); };
     on('GENERATION_STARTED', (_type, _opts, dryRun) => { if (dryRun)
-        return; state.generating = true; redraw(); });
+        return; if (game())
+        refreshPrompt(); state.generating = true; redraw(); });
     const done = () => {
         state.generating = false;
         if (state.impersonating) { // the AI wrote the player's line into SillyTavern's box: bring it to Mundi's composer

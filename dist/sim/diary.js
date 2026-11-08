@@ -6,6 +6,7 @@ import { chat, quiet, personaName, ctx, translateTo } from '../st/bridge.js';
 import { facts, factText, placeName } from './facts.js';
 import { fmtClock as hm } from '../core/fmt.js';
 import { applyVerdict } from './romance.js';
+import { diaryTexts } from './textlog.js';
 export const diaryOn = () => settings().diaryOnSleep !== false;
 export const diaryEntries = (g) => (g.journalProse ??= {});
 const clean = (t) => String(t ?? '').replace(/<(think|thinking|reasoning)>[\s\S]*?<\/\1>/gi, '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
@@ -20,7 +21,8 @@ export async function writeDiary(g, w, day, verdict = true) {
     let convo = talk.slice(-60).join('\n');
     if (convo.length > 9000)
         convo = convo.slice(-9000);
-    if (!dayFacts.length && !convo)
+    const texted = diaryTexts(g, day, me);
+    if (!dayFacts.length && !convo && !texted)
         return { ok: false, changes: [] };
     // the people of the day: who appears in the facts or spoke
     const spoke = new Set(msgs.filter((m) => !m.is_user).map((m) => String(m.name ?? '')));
@@ -30,7 +32,7 @@ export async function writeDiary(g, w, day, verdict = true) {
         `Each line exactly like this: Name | friendship +1 | romance 0 | a short reason (what happened between them and ${me} today). ` +
         `Friendship and romance go from -3 to +3; 0 when nothing changed. Romance only moves with flirting, dates or love; insults, fights or broken promises are negative. Be honest, not generous.` : '';
     const out = await quiet(`This is one day (day ${day}) in ${me}'s life in ${w.name}.\n\nWhat surely happened:\n${factList || '(nothing noted)'}\n\n` +
-        `${convo ? `What was said that day:\n${convo}\n\n` : ''}Write ${me}'s diary entry for that day, in the first person, in one or two short paragraphs (at most 150 words). ` +
+        `${convo ? `What was said that day:\n${convo}\n\n` : ''}${texted ? `Messages sent by phone that day (not in person):\n${texted}\n\n` : ''}Write ${me}'s diary entry for that day, in the first person, in one or two short paragraphs (at most 150 words). ` +
         `Keep the people's names, what ${me} felt, promises and plans made, the important things that were said, and every relationship moment (asking someone out, a proposal, a breakup, and the answer). Each of the facts above must be in the entry. Use only what is above: invent nothing.${verdictAsk}`, 2000, // room for models that think first
     'You write short, faithful diary entries from notes and conversations. You never invent events.');
     const raw = String(out ?? '').replace(/<(think|thinking|reasoning)>[\s\S]*?<\/\1>/gi, '');

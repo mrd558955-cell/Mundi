@@ -3976,6 +3976,8 @@ const DICT = {
     "Saves · {0}": "Partidas · {0}",
     "Character greetings · {0}": "Saludos de los personajes · {0}",
     "The pictures in your characters' greetings show up here.": "Las imágenes de los saludos de tus personajes aparecen aquí.",
-    "Images made in a chat (Image Generation, attached, or written as links) show up here.": "Las imágenes hechas en un chat (Generación de Imágenes, adjuntas o escritas como enlaces) aparecen aquí."
+    "Images made in a chat (Image Generation, attached, or written as links) show up here.": "Las imágenes hechas en un chat (Generación de Imágenes, adjuntas o escritas como enlaces) aparecen aquí.",
+    "Texts": "Mensajes",
+    "Your texts with the people here from the last 3 days, with when each was sent.": "Tus mensajes con la gente de aquí de los últimos 3 días, con cuándo se envió cada uno.",
 };
 export default DICT;

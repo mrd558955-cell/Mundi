@@ -72,7 +72,7 @@ function addSettingsBlock() {
 
 function follow() {
     const redraw = () => { if (state.open) notify(); };
-    on('GENERATION_STARTED', (_type: string, _opts: unknown, dryRun: boolean) => { if (dryRun) return; state.generating = true; redraw(); });
+    on('GENERATION_STARTED', (_type: string, _opts: unknown, dryRun: boolean) => { if (dryRun) return; if (game()) refreshPrompt(); state.generating = true; redraw(); });
     const done = () => {
         state.generating = false;
         if (state.impersonating) {   // the AI wrote the player's line into SillyTavern's box: bring it to Mundi's composer
